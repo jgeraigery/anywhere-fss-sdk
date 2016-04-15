@@ -23,8 +23,23 @@ A complete example is provided in the repository under /example.
 
 ## Using the HCP Anywhere File Sync and Share SDK                                                       
 
-The SDK is availble at Maven Central.
+The SDK is availble at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.hds.hcpaw%22%20AND%20a%3A%22anywhere-fss-sdk%22).
 
+### Maven Pom
+```
+<dependency>
+  <groupId>com.hds.hcpaw</groupId>
+  <artifactId>anywhere-fss-sdk</artifactId>
+  <version>2.1.1.17</version>
+</dependency>
+```
+
+### Gradle
+```
+dependencies {
+    compile 'com.hds.hcpaw:anywhere-fss-sdk:2.1.1.17'
+}
+```
 
 # Questions?
 
