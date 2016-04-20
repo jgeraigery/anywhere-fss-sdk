@@ -11,6 +11,8 @@ Once an AuthToken is acquired, you can make calls to the sub APIs by supplying t
 
 Javadoc is available as a JAR via Maven Central or [via github](http://hitachi-data-systems.github.io/anywhere-fss-sdk/javadoc/).
 
+File Sync and Share API documentation is available from the HCP Anywhere Management Console or [via github](http://hitachi-data-systems.github.io/anywhere-fss-sdk/fss-api-doc/)
+
 ## Example                                                                                          
                                             
 ```
