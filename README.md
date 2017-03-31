@@ -1,6 +1,6 @@
-# HCP Anywhere File Sync and Share SDK                                                                  
+# HCP Anywhere File Sync and Share Java SDK                                                                  
                                                                                                     
-The HCP Anywhere File Sync and Share API is an API for connecting to HCP Anywhere. This SDK provides convenient access to the HCP Anywhere FSS API. 
+The HCP Anywhere File Sync and Share API is an API for connecting to HCP Anywhere. This Java SDK provides convenient access to the HCP Anywhere FSS API. 
                                                                                                     
 In order to make calls to the sub APIs, you must acquire an AuthToken. An AuthToken can be acquired from the server by calling the authenticate method, which requires you to provide the username and password you use to access HCP Anywhere. The returned AuthToken can be saved for later use.
                                                                                                     
@@ -32,14 +32,14 @@ The SDK is availble at [Maven Central](http://search.maven.org/#search%7Cga%7C1%
 <dependency>
   <groupId>com.hds.hcpaw</groupId>
   <artifactId>anywhere-fss-sdk</artifactId>
-  <version>2.1.1.17</version>
+  <version>3.0.0.20</version>
 </dependency>
 ```
 
 ### Gradle
 ```
 dependencies {
-    compile 'com.hds.hcpaw:anywhere-fss-sdk:2.1.1.17'
+    compile 'com.hds.hcpaw:anywhere-fss-sdk:3.0.0.20'
 }
 ```
 
@@ -49,4 +49,4 @@ Reach out to Hitachi Data Systems at our community portal http://community.hds.c
 
 # Copyright and License
 
-Code and documentation copyright by Hitachi Data Systems, 2016.  Release under [the Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
+Code and documentation copyright by Hitachi Data Systems, 2017.  Release under [the Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
