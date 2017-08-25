@@ -1770,7 +1770,8 @@ public class AwSdkTest {
         PageAction pageAction = PageAction
                 .valueOf(nextString(scanner, "Enter page action [FIRST/LAST/NEXT/PREV]"));
         FilesActivity filesActivity = activityApi.getFilesActivity(authToken, activityType, fsId,
-                                                                   pageToken, pageSize, pageAction);
+                                                                   pageToken, pageSize, pageAction,
+                                                                   null);
         System.out.println("Files activity:" + filesActivity);
     }
 
@@ -1802,7 +1803,8 @@ public class AwSdkTest {
         PageAction pageAction = PageAction
                 .valueOf(nextString(scanner, "Enter page action [FIRST/LAST/NEXT/PREV]"));
         CollaborationActivity collaborationActivity = activityApi
-                .getCollaborationActivity(authToken, activityType, pageToken, pageSize, pageAction);
+                .getCollaborationActivity(authToken, activityType, pageToken, pageSize, pageAction,
+                                          null);
         System.out.println("Collaboration activity:" + collaborationActivity);
     }
 
@@ -1829,7 +1831,8 @@ public class AwSdkTest {
         PageAction pageAction = PageAction
                 .valueOf(nextString(scanner, "Enter page action [FIRST/LAST/NEXT/PREV]"));
         AccountActivity accountActivity = activityApi.getAccountActivity(authToken, pageToken,
-                                                                         pageSize, pageAction);
+                                                                         pageSize, pageAction,
+                                                                         null);
         System.out.println("Account activity:" + accountActivity);
     }
 
