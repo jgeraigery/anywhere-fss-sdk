@@ -1,7 +1,7 @@
 /*
  * ========================================================================
  *
- * Copyright (c) by Hitachi Data Systems, 2016. All rights reserved.
+ * Copyright (c) by Hitachi Vantara, 2018. All rights reserved.
  *
  * ========================================================================
  */
@@ -90,6 +90,7 @@ public class AwSdkTest {
         LINK_BROWSE("linkBrowse", "Browse a link"),
         LINK_PATH_METADATA("linkPathMetadata", "Get metadata of entry through link"),
         LINK_READ_FILE("linkReadFile", "Read a file through link"),
+        LINK_CREATE_FILE("linkCreateFile", "Uploads a file into link"),
         LINK_UPDATE_FILE("linkUpdateFile", "Update a file through link"),
         LINK_COPY_TO_LOCAL("linkCopyToLocal", "Copy files from link to local"),
         USER_INFO("userInfo", "Gets information about the authenticated user"),
@@ -281,6 +282,9 @@ public class AwSdkTest {
                                 break;
                             case LINK_READ_FILE:
                                 linkReadFile(scanner, authToken, linkApi);
+                                break;
+                            case LINK_CREATE_FILE:
+                                linkCreateFile(scanner, authToken, linkApi);
                                 break;
                             case LINK_UPDATE_FILE:
                                 linkUpdateFile(scanner, authToken, linkApi);
@@ -795,7 +799,7 @@ public class AwSdkTest {
      *
      * @param scanner User input is read from this scanner
      * @param authToken Authentication token for the user performing the request
-     * @param shareApi API for performing file operations
+     * @param fileApi API for performing file operations
      * @throws Exception
      */
     private static void restoreFile(Scanner scanner, AuthToken authToken, AnywhereFileAPI fileApi)
@@ -1096,6 +1100,47 @@ public class AwSdkTest {
             default:
                 return null;
         }
+    }
+
+    private static void linkCreateFile(Scanner scanner, AuthToken authToken,
+                                       AnywhereLinkAPI linkApi) throws Exception {
+
+        Boolean publicLink = nextBoolean(scanner, "Is the link a public link? Enter true or false");
+        String linkToken = nextString(scanner, "Enter the link token of the link");
+        String itemName = nextString(scanner, "Enter the item name of the link");
+        Boolean hasAccessCode = nextBoolean(scanner,
+                                            "Does the link have an access code? Enter true or false");
+
+        String accessCode = null;
+        if (hasAccessCode) {
+            accessCode = nextString(scanner, "Enter the access code of the link");
+        }
+
+        String sourcePath = nextString(scanner,
+                "Enter the path (including file name) of the local file");
+        String destPath = nextString(scanner,
+                "Enter the remote destination path (including file name)");
+
+        boolean createParents = nextBoolean(scanner, "Create parents?  Enter true or false");
+
+        System.out.print("Computing size and hash of local file, please wait ...");
+        System.out.flush();
+        File f = new File(sourcePath);
+        long size = f.length();
+        String hash = computeHash(f);
+        System.out.println(" Done computing size and hash");
+
+        try (InputStream in = new FileInputStream(f)) {
+            Entry entry;
+            if (publicLink) {
+                entry = linkApi.createFilePublicLink(authToken, linkToken, itemName, accessCode, destPath, size, hash, createParents, in);
+            } else {
+                entry = linkApi.createFilePrivateLink(authToken, linkToken, itemName, accessCode, destPath, size, hash, createParents, in);
+            }
+            printObject("Success!  Resulting entry: ", entry);
+        }
+
+
     }
 
     /**
@@ -1535,7 +1580,7 @@ public class AwSdkTest {
      *
      * @param scanner User input is read from this scanner
      * @param authToken Authentication token for the user performing the request
-     * @param shareApi API for performing file operations
+     * @param fileApi API for performing file operations
      * @throws Exception
      */
     private static void listVersions(Scanner scanner, AuthToken authToken, AnywhereFileAPI fileApi)
@@ -1599,7 +1644,7 @@ public class AwSdkTest {
      *
      * @param scanner User input is read from this scanner
      * @param authToken Authentication token for the user performing the request
-     * @param shareApi API for performing file operations
+     * @param fileApi API for performing file operations
      * @throws Exception
      */
     private static void listReadHistory(Scanner scanner, AuthToken authToken,
@@ -1664,7 +1709,7 @@ public class AwSdkTest {
      *
      * @param scanner User input is read from this scanner
      * @param authToken Authentication token for the user performing the request
-     * @param shareApi API for performing file operations
+     * @param fileApi API for performing file operations
      * @throws Exception
      */
     private static void listLinkReadHistory(Scanner scanner, AuthToken authToken,
@@ -1730,7 +1775,7 @@ public class AwSdkTest {
      *
      * @param scanner User input is read from this scanner
      * @param authToken Authentication token for the user performing the request
-     * @param shareApi API for performing file operations
+     * @param fileApi API for performing file operations
      * @throws Exception
      */
     private static void promoteVersion(Scanner scanner, AuthToken authToken,

@@ -32,21 +32,21 @@ The SDK is availble at [Maven Central](http://search.maven.org/#search%7Cga%7C1%
 <dependency>
   <groupId>com.hds.hcpaw</groupId>
   <artifactId>anywhere-fss-sdk</artifactId>
-  <version>3.0.3.58</version>
+  <version>4.0.0.12</version>
 </dependency>
 ```
 
 ### Gradle
 ```
 dependencies {
-    compile 'com.hds.hcpaw:anywhere-fss-sdk:3.0.3.58'
+    compile 'com.hds.hcpaw:anywhere-fss-sdk:4.0.0.12'
 }
 ```
 
 # Questions?
 
-Reach out to Hitachi Data Systems at our community portal http://community.hds.com.
+Reach out to Hitachi Vantara at our community portal http://community.hitachivantara.com.
 
 # Copyright and License
 
-Code and documentation copyright by Hitachi Data Systems, 2017.  Release under [the Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
+Code and documentation copyright by Hitachi Vantara, 2018.  Release under [the Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
