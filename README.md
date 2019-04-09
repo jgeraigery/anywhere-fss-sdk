@@ -49,4 +49,4 @@ Reach out to Hitachi Vantara at our community portal http://community.hitachivan
 
 # Copyright and License
 
-Code and documentation copyright by Hitachi Vantara, 2018.  Release under [the Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
+Code and documentation copyright by Hitachi Vantara, 2019.  Release under [the Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
