@@ -1,7 +1,7 @@
 /*
  * ========================================================================
  *
- * Copyright (c) by Hitachi Vantara, 2018. All rights reserved.
+ * Copyright (c) by Hitachi Vantara LLC 2020. All Rights Reserved.
  *
  * ========================================================================
  */
@@ -13,6 +13,7 @@ import com.google.common.collect.Sets;
 import com.hds.hcpaw.fss.api.exception.AnywhereException;
 import com.hds.hcpaw.fss.api.exception.AwUnsupportedApiVersionException;
 import com.hds.hcpaw.fss.api.model.AccountActivity;
+import com.hds.hcpaw.fss.api.model.AuthConfigListing;
 import com.hds.hcpaw.fss.api.model.AuthToken;
 import com.hds.hcpaw.fss.api.model.ClientListing;
 import com.hds.hcpaw.fss.api.model.CollaborationActivity;
@@ -37,6 +38,7 @@ import com.hds.hcpaw.fss.api.model.ShareRole;
 import com.hds.hcpaw.fss.api.model.SharedFolder;
 import com.hds.hcpaw.fss.api.model.SharedFolderListing;
 import com.hds.hcpaw.fss.api.model.User;
+import com.hds.hcpaw.fss.api.AnywhereAPI.Builder;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,10 +47,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.DigestInputStream;
+import java.security.KeyStore;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.codec.binary.Hex;
 
@@ -96,6 +108,7 @@ public class AwSdkTest {
         USER_INFO("userInfo", "Gets information about the authenticated user"),
         USER_SETTINGS_UPDATE("userSettingsUpdate", "Update user's account settings"),
         PROVIDER_LIST("listProviders", "Lists the authentication providers"),
+        AUTH_CONFIG_LIST("listAuthConfig", "Lists the authentication configurations"),
         SHARE_CREATE("createShare", "Creates a shared folder"),
         INVITE("invite", "Invite users/dlist to a shared folder"),
         LIST_GROUP_MEMBERS("listGroupMembers", "List members of a group"),
@@ -166,27 +179,79 @@ public class AwSdkTest {
     public static void main(String[] args) {
         try {
             if (args.length < 4) {
-                System.out.println("Usage: AwSdkTest <server> <port> <username> <password>");
+                System.out.println("Usage: AwSdkTest <server> <port> <username> <password> [certType] [certPath] [certPassword]");
                 System.exit(-1);
             }
 
             try (Scanner scanner = new Scanner(System.in)) {
+                AnywhereAPI api = null;
+                AuthToken authToken = null;
+                // certificate auth
+                if (args.length > 4) {
+                    SSLContext sslContext = SSLContext.getInstance("TLS");
+                    KeyStore keyStore = null;
+                    TrustManagerFactory trustManagerFactory = null;
+                    KeyManagerFactory keyManagerFactory = null;
+                    try {
+                        keyStore = KeyStore.getInstance(args[4]);
+                        keyStore.load(new FileInputStream(args[5]), args[6].toCharArray());
+                        trustManagerFactory = TrustManagerFactory
+                                .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                        trustManagerFactory.init(keyStore);
+                        keyManagerFactory = KeyManagerFactory
+                                .getInstance(KeyManagerFactory.getDefaultAlgorithm());
+                        keyManagerFactory.init(keyStore, args[6].toCharArray());
+                    } catch (Exception e) {
+                        throw e;
+                    }
 
-                AnywhereAPI api = new AnywhereAPI.Builder("https://" + args[0] + ":" + args[1])
-                        .insecureSSL().skipHostnameVerification().build();
-                AuthToken authToken;
-                try {
-                    authToken = api.authenticate(args[2], args[3]);
-                } catch (AnywhereException e) {
-                    throw e;
-                } catch (Exception e) {
-                    String technicalMessage = (e instanceof AnywhereException
-                            ? ((AnywhereException) e).getTechnicalMessage() : e.getMessage());
-                    throw new AnywhereException(technicalMessage,
-                            String.format("An error occurred authenticating user %s with HCP AW.  "
-                                    + "Make sure that the user belongs to a profile with FSS API access.",
-                                          args[2]),
-                            e);
+                    sslContext.init(keyManagerFactory.getKeyManagers(), new TrustManager[] { new X509TrustManager() {
+                        @Override
+                        public void checkClientTrusted(X509Certificate[] chain, String authType)
+                                throws CertificateException {
+                        }
+
+                        @Override
+                        public void checkServerTrusted(X509Certificate[] chain, String authType)
+                                throws CertificateException {
+                        }
+
+                        @Override
+                        public X509Certificate[] getAcceptedIssuers() {
+                            return new X509Certificate[] {};
+                        }
+                    } }, new SecureRandom());
+
+                    api = new AnywhereAPI.Builder("https://" + args[0] + ":" + args[1])
+                            .useSSLContext(sslContext).skipHostnameVerification().build();
+                    try {
+                        authToken = api.authenticateCertificate();
+                    } catch (Exception e) {
+                        String technicalMessage = (e instanceof AnywhereException
+                                ? ((AnywhereException) e).getTechnicalMessage()
+                                : e.getMessage());
+                        throw new AnywhereException(technicalMessage,
+                                String.format("An error occurred while registering via cert %s.",
+                                              args[5]),
+                                e);
+                    }
+                } else {
+                    api = new AnywhereAPI.Builder("https://" + args[0] + ":" + args[1])
+                            .insecureSSL().skipHostnameVerification().build();
+                    try {
+                        authToken = api.authenticate(args[2], args[3]);
+                    } catch (AnywhereException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        String technicalMessage = (e instanceof AnywhereException
+                                ? ((AnywhereException) e).getTechnicalMessage()
+                                : e.getMessage());
+                        throw new AnywhereException(technicalMessage,
+                                String.format("An error occurred authenticating user %s with HCP AW.  "
+                                        + "Make sure that the user belongs to a profile with FSS API access.",
+                                              args[2]),
+                                e);
+                    }
                 }
 
                 AnywhereFolderAPI folderApi = api.getFolderAPI();
@@ -300,6 +365,8 @@ public class AwSdkTest {
                             case PROVIDER_LIST:
                                 listProviders(scanner, providerApi);
                                 break;
+                            case AUTH_CONFIG_LIST:
+                                listAuthConfig(scanner, providerApi);
                             case SHARE_CREATE:
                                 createShare(scanner, authToken, shareApi);
                                 break;
@@ -1189,6 +1256,21 @@ public class AwSdkTest {
         ProviderListing providers = providerApi.listProviders();
         if (providers != null) {
             System.out.println("List of providers: " + providers.toString());
+        }
+    }
+
+    /**
+     * List the authentication configurations
+     *
+     * @param scanner User input is read from this scanner.
+     * @param providerApi API for performing provider operations
+     * @throws Exception
+     */
+    private static void listAuthConfig(Scanner scanner, AnywhereProviderAPI providerApi)
+            throws Exception {
+        AuthConfigListing configs = providerApi.listAuthConfig();
+        if (configs != null) {
+            System.out.println("List of configurations: " + configs.toString());
         }
     }
 

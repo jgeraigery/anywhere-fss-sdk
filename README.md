@@ -2,7 +2,7 @@
                                                                                                     
 The HCP Anywhere File Sync and Share API is an API for connecting to HCP Anywhere. This Java SDK provides convenient access to the HCP Anywhere FSS API. 
                                                                                                     
-In order to make calls to the sub APIs, you must acquire an AuthToken. An AuthToken can be acquired from the server by calling the authenticate method, which requires you to provide the username and password you use to access HCP Anywhere. The returned AuthToken can be saved for later use.
+In order to make calls to the sub APIs, you must acquire an AuthToken. An AuthToken can be acquired from the server by calling the authenticate method, which requires you to provide the username and password or certificate you use to access HCP Anywhere. The returned AuthToken can be saved for later use.
                                                                                                     
 Once an AuthToken is acquired, you can make calls to the sub APIs by supplying the token and any other required arguments of the sub APIs.
 
@@ -32,14 +32,14 @@ The SDK is availble at [Maven Central](http://search.maven.org/#search%7Cga%7C1%
 <dependency>
   <groupId>com.hds.hcpaw</groupId>
   <artifactId>anywhere-fss-sdk</artifactId>
-  <version>4.0.0.12</version>
+  <version>4.3.2.33</version>
 </dependency>
 ```
 
 ### Gradle
 ```
-dependencies {
-    compile 'com.hds.hcpaw:anywhere-fss-sdk:4.0.0.12'
+dependencies 
+    compile 'com.hds.hcpaw:anywhere-fss-sdk:4.3.2.33'
 }
 ```
 
@@ -49,4 +49,4 @@ Reach out to Hitachi Vantara at our community portal http://community.hitachivan
 
 # Copyright and License
 
-Code and documentation copyright by Hitachi Vantara, 2019.  Release under [the Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
+Code and documentation copyright by Hitachi Vantara LLC 2020. All Rights Reserved.  Release under [the Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
