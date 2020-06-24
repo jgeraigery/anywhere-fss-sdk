@@ -1,13 +1,14 @@
 /*
  * ========================================================================
  *
- * Copyright (c) by Hitachi Vantara LLC 2020. All Rights Reserved.
+ * Copyright (c) by Hitachi Vantara, 2018. All rights reserved.
  *
  * ========================================================================
  */
 
 package com.hds.hcpaw.fss.api;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.hds.hcpaw.fss.api.exception.AnywhereException;
@@ -887,7 +888,11 @@ public class AwSdkTest {
      */
     private static void createLink(Scanner scanner, AuthToken authToken, AnywhereLinkAPI linkApi)
             throws Exception {
-        String path = nextString(scanner, "Enter the path to the file or folder to share as link");
+        String uniqueId = nextString(scanner, "Enter the uniqueId to the file or folder to share as link");
+        String path = null;
+        if (Strings.isNullOrEmpty(uniqueId)) {
+            path = nextString(scanner, "Enter the path to the file or folder to share as link");
+        }
         int expirationDays = nextInt(scanner, "Enter the number of days until the link expires");
         boolean isPublic = nextBoolean(scanner, "Is link public?  Enter true or false");
         boolean useAccessCode = nextBoolean(scanner, "Use an access code? Enter true or false");
@@ -898,7 +903,7 @@ public class AwSdkTest {
         }
 
         Link link = linkApi.create(authToken, path, expirationDays, isPublic, useAccessCode,
-                                   permissions);
+                                   permissions, uniqueId);
         printObject("Success! Resulting link: ", link);
     }
 
@@ -912,14 +917,12 @@ public class AwSdkTest {
      */
     private static void updateLink(Scanner scanner, AuthToken authtoken, AnywhereLinkAPI linkApi)
             throws Exception {
-        String path = nextString(scanner,
-                                 "Enter the path to the file or folder of the shared link");
         String url = nextString(scanner, "Enter the url of the shared link");
         boolean newAccessCode = nextBoolean(scanner,
                                             "Update link with a new access code? Enter true or false");
         long expirationDate = nextLong(scanner,
                                        "Enter the new expiration date (epoch time in millis).");
-        Link link = linkApi.update(authtoken, path, url, newAccessCode, expirationDate);
+        Link link = linkApi.update(authtoken, url, newAccessCode, expirationDate);
         printObject("Successfully updated link: ", link);
     }
 
@@ -933,10 +936,8 @@ public class AwSdkTest {
      */
     private static void deleteLink(Scanner scanner, AuthToken authToken, AnywhereLinkAPI linkApi)
             throws Exception {
-        String path = nextString(scanner,
-                                 "Enter the path to the file or folder of the shared link");
         String url = nextString(scanner, "Enter the url of the shared link");
-        linkApi.delete(authToken, path, url);
+        linkApi.delete(authToken, url);
         System.out.println("Successfully deleted link.");
     }
 
@@ -1239,8 +1240,10 @@ public class AwSdkTest {
         boolean emailShareFolder = nextBoolean(scanner,
                                                "Send email if is invited to a shared folder? Enter true or false");
         String language = nextString(scanner, "Language used by the user");
+        boolean openFilesOnClick = nextBoolean(scanner, "Open Office file on single-click? Enter true or false");
+        boolean showSingleClickUserGuide = nextBoolean(scanner, "User is accessing office file first time? Enter true or false");
         User user = userApi.updateSetting(authToken, email, emailQuota, emailDevices, emailAuth,
-                                          emailShareFile, emailUpload, emailShareFolder, language);
+                                          emailShareFile, emailUpload, emailShareFolder, language, openFilesOnClick, showSingleClickUserGuide);
         System.out.println("Successfully updated user settings!  User info: " + user.toString());
     }
 
